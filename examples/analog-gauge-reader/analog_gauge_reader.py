@@ -7,6 +7,7 @@ import cv2
 import numpy as np
 #import paho.mqtt.client as mqtt
 import time
+import os
 
 def avg_circles(circles, b):
     avg_x=0
@@ -37,8 +38,8 @@ def calibrate_gauge(gauge_number, file_type):
         It will return the min value with angle in degrees (as a tuple), the max value with angle in degrees (as a tuple),
         and the units (as a string).
     '''
-
-    img = cv2.imread('gauge-%s.%s' %(gauge_number, file_type))
+    path = os.getcwd() + "\\"
+    img = cv2.imread(path + "examples\\analog-gauge-reader\\images\\gauge-%s.%s" % (gauge_number, file_type))
     height, width = img.shape[:2]
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)  #convert to gray
     #gray = cv2.GaussianBlur(gray, (5, 5), 0)
@@ -103,12 +104,12 @@ def calibrate_gauge(gauge_number, file_type):
     cv2.imwrite('gauge-%s-calibration.%s' % (gauge_number, file_type), img)
 
     #get user input on min, max, values, and units
-    print 'gauge number: %s' %gauge_number
-    min_angle = raw_input('Min angle (lowest possible angle of dial) - in degrees: ') #the lowest possible angle
-    max_angle = raw_input('Max angle (highest possible angle) - in degrees: ') #highest possible angle
-    min_value = raw_input('Min value: ') #usually zero
-    max_value = raw_input('Max value: ') #maximum reading of the gauge
-    units = raw_input('Enter units: ')
+    print ('Gauge number:', gauge_number)
+    min_angle = input('Min angle (lowest possible angle of dial) - in degrees: ') #the lowest possible angle
+    max_angle = input('Max angle (highest possible angle) - in degrees: ') #highest possible angle
+    min_value = input('Min value: ') #usually zero
+    max_value = input('Max value: ') #maximum reading of the gauge
+    units = input('Enter units: ')
 
     #for testing purposes: hardcode and comment out raw_inputs above
     # min_angle = 45
@@ -256,11 +257,12 @@ def main():
     file_type='jpg'
     # name the calibration image of your gauge 'gauge-#.jpg', for example 'gauge-5.jpg'.  It's written this way so you can easily try multiple images
     min_angle, max_angle, min_value, max_value, units, x, y, r = calibrate_gauge(gauge_number, file_type)
-
+    path = os.getcwd() + "\\"
     #feed an image (or frame) to get the current value, based on the calibration, by default uses same image as calibration
-    img = cv2.imread('gauge-%s.%s' % (gauge_number, file_type))
+    img = cv2.imread(path + "examples\\analog-gauge-reader\\images\\gauge-%s.%s" % (gauge_number, file_type))
+    #print(img)
     val = get_current_value(img, min_angle, max_angle, min_value, max_value, x, y, r, gauge_number, file_type)
-    print "Current reading: %s %s" %(val, units)
+    print ("Current reading: ", val, units)
 
 if __name__=='__main__':
     main()
